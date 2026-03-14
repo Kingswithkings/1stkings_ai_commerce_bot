@@ -1,0 +1,15 @@
+business_id,sku,name,aliases,price,unit,category,in_stock
+1,KIT001,Plate Set,"plates,plate set,dinner plates",8.99,set,Kitchen,1
+1,KIT002,Cup Set,"cups,mugs,cup set",6.50,set,Kitchen,1
+1,BAT001,Bath Towel,"bath towel,towel",5.99,each,Bathroom,1
+1,SMK001,Ash Tray,"ashtray,ash tray",3.50,each,Smoking Items,1
+1,BAG001,School Bag,"school bag,backpack,school backpack",12.99,each,Bags,1
+1,BAG002,Travel Bag,"travel bag,luggage bag,travelling bag",22.99,each,Bags,1
+1,CRP001,Small Carpet,"small carpet,small rug",14.50,each,Carpets,1
+1,RAG001,Floor Rag,"rag,floor rag,cleaning rag",2.50,each,Rags,1
+1,PER001,Body Spray,"body spray,spray,perfume spray",4.99,each,Perfumes,1
+1,PER002,Men Perfume,"men perfume,perfume for men",9.99,each,Perfumes,1
+1,MOB001,Phone Case,"phone case,mobile case",5.99,each,Mobile Accessories,1
+1,MOB002,Earphones,"earphones,ear buds",6.99,each,Mobile Accessories,1
+1,CHG001,Android Charger,"android charger,type c charger",7.99,each,Chargers,1
+1,CHG002,iPhone Charger,"iphone charger,lightning charger",9.99,each,Chargers,1
