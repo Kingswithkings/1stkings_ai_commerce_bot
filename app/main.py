@@ -1,9 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes.chat import router as chat_router
 from app.routes.products import router as products_router
-from app.routes.webhook import router as sendpulse_router   # ✅ ADD THIS
+from app.routes.webhook import router as sendpulse_router
 
 app = FastAPI(title="Conversational Ordering API")
 
@@ -15,6 +14,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/health")
+def health():
+    return {"ok": True}
+
 app.include_router(products_router)
-app.include_router(chat_router)
-app.include_router(sendpulse_router)   # ✅ ADD THIS
+app.include_router(sendpulse_router)
