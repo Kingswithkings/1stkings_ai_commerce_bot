@@ -1,49 +1,59 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
-import json
 
 router = APIRouter()
 
 
+def extract_sendpulse_event(payload):
+    """
+    Supports SendPulse event webhook payloads shaped like a list.
+    """
+    event = payload[0] if isinstance(payload, list) and payload else payload
+
+    contact = event.get("contact", {}) if isinstance(event, dict) else {}
+    last_message_data = contact.get("last_message_data", {}) or {}
+    message_obj = last_message_data.get("message", {}) or {}
+    text_obj = message_obj.get("text", {}) or {}
+
+    phone = str(contact.get("phone", "")).strip()
+    message = str(text_obj.get("body") or contact.get("last_message") or "").strip()
+
+    return {
+        "phone": phone,
+        "message": message,
+        "raw_event": event,
+    }
+
+
 @router.post("/webhook/sendpulse")
 async def sendpulse_webhook(request: Request):
-    content_type = (request.headers.get("content-type") or "").lower()
+    payload = await request.json()
+    data = extract_sendpulse_event(payload)
 
-    raw_body = await request.body()
-    payload = None
-    form_data = None
+    phone = data["phone"]
+    message = data["message"]
 
-    try:
-        if "application/json" in content_type:
-            payload = await request.json()
-        elif "application/x-www-form-urlencoded" in content_type or "multipart/form-data" in content_type:
-            form = await request.form()
-            form_data = dict(form)
-        else:
-            try:
-                payload = json.loads(raw_body.decode("utf-8"))
-            except Exception:
-                payload = None
-    except Exception as e:
-        print("WEBHOOK PARSE ERROR:", repr(e))
+    print("SENDPULSE PHONE:", phone)
+    print("SENDPULSE MESSAGE:", message)
 
-    print("\n=== SENDPULSE WEBHOOK START ===")
-    print("Content-Type:", content_type)
-    print("Headers:", dict(request.headers))
-
-    if payload is not None:
-        print("JSON PAYLOAD:")
-        print(json.dumps(payload, indent=2, ensure_ascii=False))
-    elif form_data is not None:
-        print("FORM PAYLOAD:")
-        print(form_data)
+    # Temporary reply logic
+    if message.lower() in ["hi", "hello", "hey", "start"]:
+        reply = (
+            "Welcome to Najeebullah Store 👋\n\n"
+            "Try:\n"
+            "- categories\n"
+            "- search charger\n"
+            "- cart\n"
+            "- checkout\n"
+            "- or send your order naturally"
+        )
     else:
-        print("RAW BODY:")
-        print(raw_body.decode("utf-8", errors="replace"))
+        reply = f"You said: {message}"
 
-    print("=== SENDPULSE WEBHOOK END ===\n")
-
-    return JSONResponse(
-        status_code=200,
-        content={"status": "ok"}
-    )
+    # This returns data to SendPulse, but it will only appear in chat
+    # if you use an API Request block in the flow builder.
+    return JSONResponse({
+        "reply": reply,
+        "phone": phone,
+        "message": message,
+    })
