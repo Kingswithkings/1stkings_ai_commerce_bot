@@ -1,3 +1,9 @@
+from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
+
+router = APIRouter()
+
+
 @router.post("/webhook/sendpulse")
 async def sendpulse_webhook(request: Request):
     try:
@@ -16,7 +22,7 @@ async def sendpulse_webhook(request: Request):
 
     elif isinstance(payload, list) and payload:
         event = payload[0]
-        contact = event.get("contact", {})
+        contact = event.get("contact", {}) if isinstance(event, dict) else {}
         last_message_data = contact.get("last_message_data", {}) or {}
         message_obj = last_message_data.get("message", {}) or {}
         text_obj = message_obj.get("text", {}) or {}
