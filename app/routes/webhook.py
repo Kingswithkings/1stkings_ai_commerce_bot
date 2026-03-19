@@ -31,7 +31,10 @@ async def sendpulse_webhook(request: Request):
         message = str(text_obj.get("body") or contact.get("last_message") or "").strip()
 
     reply = f"DEBUG OK | phone={phone} | message={message}"
-
+    # SendPulse webhook responders typically expect a 'message' or 'text' field for outgoing replies.
+    # Keep 'reply' for debugging while returning the field(s SendPulse can use.
     return JSONResponse({
-        "reply": reply
+        "reply": reply,
+        "message": reply,
+        "text": reply,
     })
