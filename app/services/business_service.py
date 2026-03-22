@@ -41,6 +41,7 @@ def handle_text(phone: str, message: str) -> str:
     if "product" in text or text == "catalog":
         return list_products_text()
 
+    # Add with quantity, e.g. "add 2 beans"
     match_add = re.match(r"add\s+(\d+)?\s*([a-zA-Z ]+)$", text)
     if match_add:
         qty = int(match_add.group(1)) if match_add.group(1) else 1
@@ -48,6 +49,13 @@ def handle_text(phone: str, message: str) -> str:
         ok, reply = add_to_cart(phone, product_name, qty)
         return reply
 
+    # Simple product name, e.g. "rice"
+    products_keywords = ["rice", "beans", "oil", "bread"]
+    if text in products_keywords:
+        ok, reply = add_to_cart(phone, text, 1)
+        return reply
+
+    # Remove item
     match_remove = re.match(r"remove\s+([a-zA-Z ]+)$", text)
     if match_remove:
         product_name = match_remove.group(1).strip()
