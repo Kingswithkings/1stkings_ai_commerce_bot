@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request
+from app.services.business_service import handle_text
 
 router = APIRouter()
 
@@ -7,13 +8,13 @@ router = APIRouter()
 async def sendpulse_webhook(request: Request):
     try:
         payload = await request.json()
-    except:
+    except Exception:
         payload = {}
 
     phone = payload.get("phone", "")
     message = payload.get("message", "")
 
-    reply = f"DEBUG OK | phone={phone} | message={message}"
+    reply = handle_text(phone, message)
 
     print("REPLY:", reply)
 
