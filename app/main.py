@@ -3,8 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 from app.routes.webhook import router as sendpulse_router
+from app.db import init_db
 
 load_dotenv()
+init_db()
 
 app = FastAPI(title="Conversational Ordering API")
 
