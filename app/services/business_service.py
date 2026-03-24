@@ -20,6 +20,7 @@ def handle_text(phone: str, message: str) -> str:
             "- add rice\n"
             "- add 2 beans\n"
             "- rice\n"
+            "- remove rice\n"
             "- cart\n"
             "- clear cart\n"
             "- checkout\n"
@@ -37,13 +38,14 @@ def handle_text(phone: str, message: str) -> str:
             "- cart\n"
             "- clear cart\n"
             "- checkout\n"
-            "- or say things like: I want 2 rice"
+            "- or say things like: I want 2 rice\n"
+            "- or: I want 2 rice and 1 oil"
         )
 
     if "product" in text or text == "catalog":
         return list_products_text()
 
-    # Explicit add command
+    # Explicit add command, e.g. "add 2 beans"
     match_add = re.match(r"add\s+(\d+)?\s*([a-zA-Z ]+)$", text)
     if match_add:
         qty = int(match_add.group(1)) if match_add.group(1) else 1
@@ -51,21 +53,19 @@ def handle_text(phone: str, message: str) -> str:
         ok, reply = add_to_cart(phone, product_name, qty)
         return reply
 
-    # Natural ordering: "i want 2 rice", "2 beans", "need oil"
-    match_natural = re.search(
-        r"(?:i want|i need|want|need)?\s*(\d+)?\s*([a-zA-Z]+)$",
-        text
-    )
+    # Multi-item natural ordering, e.g. "i want 2 rice and 1 oil"
     products_keywords = ["rice", "beans", "oil", "bread"]
+    matches = re.findall(r"(\d+)?\s*(rice|beans|oil|bread)", text)
 
-    if match_natural:
-        qty = int(match_natural.group(1)) if match_natural.group(1) else 1
-        product_name = match_natural.group(2).strip()
-        if product_name in products_keywords:
-            ok, reply = add_to_cart(phone, product_name, qty)
-            return reply
+    if matches:
+        responses = []
+        for qty, product in matches:
+            quantity = int(qty) if qty else 1
+            ok, reply = add_to_cart(phone, product, quantity)
+            responses.append(reply)
+        return "\n".join(responses)
 
-    # Simple product name
+    # Single-item natural ordering, e.g. "rice"
     if text in products_keywords:
         ok, reply = add_to_cart(phone, text, 1)
         return reply
