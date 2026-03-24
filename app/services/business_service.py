@@ -19,7 +19,7 @@ def handle_text(phone: str, message: str) -> str:
             "- products\n"
             "- add rice\n"
             "- add 2 beans\n"
-            "- remove rice\n"
+            "- rice\n"
             "- cart\n"
             "- clear cart\n"
             "- checkout\n"
@@ -32,16 +32,18 @@ def handle_text(phone: str, message: str) -> str:
             "- products\n"
             "- add rice\n"
             "- add 2 beans\n"
+            "- rice\n"
             "- remove rice\n"
             "- cart\n"
             "- clear cart\n"
-            "- checkout"
+            "- checkout\n"
+            "- or say things like: I want 2 rice"
         )
 
     if "product" in text or text == "catalog":
         return list_products_text()
 
-    # Add with quantity, e.g. "add 2 beans"
+    # Explicit add command
     match_add = re.match(r"add\s+(\d+)?\s*([a-zA-Z ]+)$", text)
     if match_add:
         qty = int(match_add.group(1)) if match_add.group(1) else 1
@@ -49,8 +51,21 @@ def handle_text(phone: str, message: str) -> str:
         ok, reply = add_to_cart(phone, product_name, qty)
         return reply
 
-    # Simple product name, e.g. "rice"
+    # Natural ordering: "i want 2 rice", "2 beans", "need oil"
+    match_natural = re.search(
+        r"(?:i want|i need|want|need)?\s*(\d+)?\s*([a-zA-Z]+)$",
+        text
+    )
     products_keywords = ["rice", "beans", "oil", "bread"]
+
+    if match_natural:
+        qty = int(match_natural.group(1)) if match_natural.group(1) else 1
+        product_name = match_natural.group(2).strip()
+        if product_name in products_keywords:
+            ok, reply = add_to_cart(phone, product_name, qty)
+            return reply
+
+    # Simple product name
     if text in products_keywords:
         ok, reply = add_to_cart(phone, text, 1)
         return reply
