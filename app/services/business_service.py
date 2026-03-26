@@ -5,12 +5,33 @@ from app.services.cart_service import (
     remove_from_cart,
     cart_text,
     clear_cart,
-    checkout_text,
+    get_cart,
+)
+from app.services.order_service import (
+    get_checkout_session,
+    start_checkout,
+    update_checkout_name,
+    update_checkout_address,
+    update_checkout_delivery_time,
 )
 
 
 def handle_text(phone: str, message: str) -> str:
     text = (message or "").strip().lower()
+
+    # Checkout session handling first
+    session = get_checkout_session(phone)
+    if session:
+        step = session["step"]
+
+        if step == "awaiting_name":
+            return update_checkout_name(phone, message.strip())
+
+        if step == "awaiting_address":
+            return update_checkout_address(phone, message.strip())
+
+        if step == "awaiting_delivery_time":
+            return update_checkout_delivery_time(phone, message.strip())
 
     if text in {"hi", "hello", "hey", "start"}:
         return (
@@ -84,6 +105,9 @@ def handle_text(phone: str, message: str) -> str:
         return clear_cart(phone)
 
     if text == "checkout":
-        return checkout_text(phone)
+        cart_rows = get_cart(phone)
+        if not cart_rows:
+            return "Your cart is empty. Add products before checkout."
+        return start_checkout(phone)
 
     return "I didn't understand that. Type 'help' or 'products'."

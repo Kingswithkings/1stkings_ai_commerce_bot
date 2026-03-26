@@ -26,5 +26,30 @@ def init_db():
     )
     """)
 
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        phone TEXT NOT NULL,
+        customer_name TEXT,
+        address TEXT,
+        delivery_time TEXT,
+        items TEXT NOT NULL,
+        total REAL NOT NULL DEFAULT 0,
+        status TEXT NOT NULL DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS checkout_sessions (
+        phone TEXT PRIMARY KEY,
+        step TEXT NOT NULL,
+        customer_name TEXT,
+        address TEXT,
+        delivery_time TEXT,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
     conn.commit()
     conn.close()

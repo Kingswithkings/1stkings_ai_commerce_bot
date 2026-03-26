@@ -113,6 +113,26 @@ def get_cart(phone: str):
     return rows
 
 
+def get_cart_total(phone: str) -> float:
+    rows = get_cart(phone)
+    total = 0.0
+    for row in rows:
+        total += row["quantity"] * row["unit_price"]
+    return total
+
+
+def get_cart_items_text(phone: str) -> str:
+    rows = get_cart(phone)
+    if not rows:
+        return ""
+
+    lines = []
+    for row in rows:
+        line_total = row["quantity"] * row["unit_price"]
+        lines.append(f"- {row['product_name']} x {row['quantity']} = £{line_total:.2f}")
+    return "\n".join(lines)
+
+
 def cart_text(phone: str):
     rows = get_cart(phone)
     if not rows:
@@ -124,19 +144,7 @@ def cart_text(phone: str):
     for row in rows:
         line_total = row["quantity"] * row["unit_price"]
         total += line_total
-        lines.append(
-            f"- {row['product_name']} x {row['quantity']} = £{line_total:.2f}"
-        )
+        lines.append(f"- {row['product_name']} x {row['quantity']} = £{line_total:.2f}")
 
     lines.append(f"\nTotal: £{total:.2f}")
     return "\n".join(lines)
-
-
-def checkout_text(phone: str):
-    rows = get_cart(phone)
-    if not rows:
-        return "Your cart is empty. Add products before checkout."
-
-    message = cart_text(phone) + "\n\n✅ Order placed successfully!"
-    clear_cart(phone)
-    return message
